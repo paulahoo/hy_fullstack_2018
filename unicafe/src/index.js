@@ -1,6 +1,31 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+const Keskiarvo = (props) => {
+  const lkm = props.arvot.hyva + props.arvot.neutraali +props.arvot.huono
+  const hyvat = props.arvot.hyva * 1
+  const neutraalit = props.arvot.neutraali * 0
+  const huonot = props.arvot.huono * -1
+  const keskiarvo = ((hyvat + neutraalit + huonot) / lkm)
+
+  return (
+    <div>
+      <p>keskiarvo {keskiarvo}</p>
+    </div>
+  )
+}
+
+const Positiivisetprosentti = (props) => {
+  const lkm = props.arvot.hyva + props.arvot.neutraali +props.arvot.huono
+  const prosentti = props.arvot.hyva / lkm * 100
+
+  return (
+    <div>
+      <p>positiivisia {prosentti} % </p>
+    </div>
+  )
+}
+
 class App extends React.Component {
   constructor(props) {
     super(props)
@@ -46,6 +71,8 @@ class App extends React.Component {
         <div>Hyvä {this.state.hyva}</div>
         <div>Neutraali {this.state.neutraali}</div>
         <div>Huono {this.state.huono}</div>
+        <Keskiarvo arvot={this.state} />
+        <Positiivisetprosentti arvot={this.state} />
       </div>
     )
   }
