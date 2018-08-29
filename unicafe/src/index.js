@@ -26,10 +26,10 @@ const PositivePercent = (props) => {
   )
 }
 
-const Button = (props) => {
-  return (
-    <button onClick= {props.button.handler}>
-      {props.button.name}
+const Button = ({name, handleClick}) => {
+  return(
+    <button onClick= {handleClick}>
+      {name}
     </button>
   )
 }
@@ -43,7 +43,6 @@ const Statistic = (props) => {
 }
 
 const Statistics = (props) => {
-
   const isStatistics = props.values.hyva + props.values.neutraali + props.values.huono
   const greeting = "ei yhtään palautetta annettu"
   let statisticsData
@@ -88,6 +87,21 @@ const Statistics = (props) => {
   )
 }
 
+const stateNames = {
+    names: [
+      {
+        name: 'hyva'
+      },
+      {
+        name: 'neutraali'
+      },
+      {
+        name: 'huono'
+      }
+    ]
+  }
+
+
 class App extends React.Component {
   constructor(props) {
     super(props)
@@ -98,49 +112,37 @@ class App extends React.Component {
     }
   }
 
+  setStateValue = (stateName, stateValue) => {
+    if (stateName === stateNames.names[0].name){
+      return () => {
+        this.setState({ hyva: stateValue })
+      }
+    } else if (stateName === stateNames.names[1].name) {
+      return () => {
+        this.setState({ neutraali: stateValue })
+      }
+    }  else {
+      return () => {
+        this.setState({ huono: stateValue })
+      }
+    }
+  }
+
   render() {
-
-    const handleGoodClick = () => {
-      this.setState({
-        hyva: this.state.hyva + 1
-      })
-    }
-    const handleNeutralClick = () => {
-      this.setState({
-        neutraali: this.state.neutraali + 1
-      })
-    }
-
-    const handleBadClick = () => {
-      this.setState({
-        huono: this.state.huono + 1
-      })
-    }
-
-    const buttons = {
-      parts: [
-        {
-          name: 'Hyvä',
-          handler: handleGoodClick
-        },
-        {
-          name: 'Neutraali',
-          handler: handleNeutralClick
-        },
-        {
-          name: 'Huono',
-          handler: handleBadClick
-        }
-      ]
-    }
 
     return (
       <div>
         <h1>Anna palautetta</h1>
         <div>
-          <Button button={buttons.parts[0]} />
-          <Button button={buttons.parts[1]} />
-          <Button button={buttons.parts[2]} />
+          <Button name={stateNames.names[0].name}
+            handleClick={this.setStateValue(stateNames.names[0].name, this.state.hyva+1)}
+          />
+          <Button name={stateNames.names[1].name}
+            handleClick= {this.setStateValue(stateNames.names[1].name, this.state.neutraali+1)}
+          />
+          <Button name={stateNames.names[2].name}
+            handleClick= {this.setStateValue(stateNames.names[2].name, this.state.huono+1)}
+          />
         </div>
         <Statistics values={this.state} />
       </div>
