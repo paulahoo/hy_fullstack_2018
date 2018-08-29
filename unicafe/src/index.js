@@ -9,9 +9,7 @@ const Average = (props) => {
   const average = ((goods + neutrals + bads) / pcs)
 
   return (
-    <div>
-      <div>keskiarvo {average}</div>
-    </div>
+      <tr><td>keskiarvo {average}</td></tr>
   )
 }
 
@@ -20,9 +18,7 @@ const PositivePercent = (props) => {
   const percent = props.statisticvalues.hyva / pcs * 100
 
   return (
-    <div>
-      <div>positiivisia {percent} % </div>
-    </div>
+      <tr><td>positiivisia {percent} % </td></tr>
   )
 }
 
@@ -36,9 +32,7 @@ const Button = ({name, handleClick}) => {
 
 const Statistic = (props) => {
   return (
-    <div>
-      <div>{props.statisticvalues.name} {props.statisticvalues.value} </div>
-    </div>
+      <tr><td>{props.statisticvalues.name} {props.statisticvalues.value}</td></tr>
   )
 }
 
@@ -68,18 +62,21 @@ const Statistics = (props) => {
   if (isStatistics)
   {
     statisticsData =
-     <div>
-        <Statistic statisticvalues={statisticvalues.parts[0]} />
-        <Statistic statisticvalues={statisticvalues.parts[1]} />
-        <Statistic statisticvalues={statisticvalues.parts[2]} />
-        <Average statisticvalues={props.values} />
-        <PositivePercent statisticvalues={props.values} />
-      </div>
+      <table>
+        <tbody>
+          <Statistic statisticvalues={statisticvalues.parts[0]} />
+          <Statistic statisticvalues={statisticvalues.parts[1]} />
+          <Statistic statisticvalues={statisticvalues.parts[2]} />
+          <Average statisticvalues={props.values} />
+          <PositivePercent statisticvalues={props.values} />
+        </tbody>
+      </table>
   } else {
     statisticsData = greeting
   }
 
   return (
+
     <div>
       <h1>{statisticvalues.name}</h1>
       {statisticsData}
