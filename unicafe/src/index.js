@@ -43,6 +43,11 @@ const Statistic = (props) => {
 }
 
 const Statistics = (props) => {
+
+  const isStatistics = props.values.hyva + props.values.neutraali + props.values.huono
+  const greeting = "ei yhtään palautetta annettu"
+  let statisticsData
+
   const statisticvalues = {
     name: 'Statistiikka',
     parts: [
@@ -61,14 +66,24 @@ const Statistics = (props) => {
     ]
   }
 
+  if (isStatistics)
+  {
+    statisticsData =
+     <div>
+        <Statistic statisticvalues={statisticvalues.parts[0]} />
+        <Statistic statisticvalues={statisticvalues.parts[1]} />
+        <Statistic statisticvalues={statisticvalues.parts[2]} />
+        <Average statisticvalues={props.values} />
+        <PositivePercent statisticvalues={props.values} />
+      </div>
+  } else {
+    statisticsData = greeting
+  }
+
   return (
     <div>
       <h1>{statisticvalues.name}</h1>
-      <Statistic statisticvalues={statisticvalues.parts[0]} />
-      <Statistic statisticvalues={statisticvalues.parts[1]} />
-      <Statistic statisticvalues={statisticvalues.parts[2]} />
-      <Average statisticvalues={props.values} />
-      <PositivePercent statisticvalues={props.values} />
+      {statisticsData}
     </div>
   )
 }
@@ -84,18 +99,19 @@ class App extends React.Component {
   }
 
   render() {
-    const goodbuttonhandler = () => {
+
+    const handleGoodClick = () => {
       this.setState({
         hyva: this.state.hyva + 1
       })
     }
-    const neutralbuttonhandler = () => {
+    const handleNeutralClick = () => {
       this.setState({
         neutraali: this.state.neutraali + 1
       })
     }
 
-    const badbuttonhandler = () => {
+    const handleBadClick = () => {
       this.setState({
         huono: this.state.huono + 1
       })
@@ -105,15 +121,15 @@ class App extends React.Component {
       parts: [
         {
           name: 'Hyvä',
-          handler: goodbuttonhandler
+          handler: handleGoodClick
         },
         {
           name: 'Neutraali',
-          handler: neutralbuttonhandler
+          handler: handleNeutralClick
         },
         {
           name: 'Huono',
-          handler: badbuttonhandler
+          handler: handleBadClick
         }
       ]
     }
