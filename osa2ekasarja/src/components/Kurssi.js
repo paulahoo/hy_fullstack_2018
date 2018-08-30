@@ -4,7 +4,6 @@ import Sisalto from './Sisalto'
 import Yhteensa from './Yhteensa'
 
 const Kurssi = ({kurssi}) => {
-  console.log(kurssi)
   return (
     <div>
       <Otsikko kurssi={kurssi} />
