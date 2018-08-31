@@ -1,9 +1,10 @@
 import React from 'react'
+import CountrySelection from './CountrySelection'
 
 const Country = ({ country, detailData }) => {
   if (!detailData) {
     return (
-      <li>{country.name}</li>
+      <CountrySelection country={country} />
     )
   } else {
     return (
