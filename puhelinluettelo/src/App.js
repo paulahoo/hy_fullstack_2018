@@ -1,6 +1,8 @@
 import React from 'react';
 import Person from './components/Person'
-import axios from 'axios'
+import Notification from './components/Notification'
+import personService from './services/persons'
+import './index.css'
 
 class App extends React.Component {
   constructor(props) {
@@ -10,17 +12,17 @@ class App extends React.Component {
       newName: '',
       newNumber: '',
       filter: '',
-      filteredItems: []
+      filteredItems: [],
+      noticeType: 'NOTICE',
+      notice: null
     }
   }
 
   componentDidMount() {
-    console.log('did mount')
-    axios
-      .get('http://localhost:3001/persons')
+    personService
+      .getAll()
       .then(response => {
-        console.log('promise fulfilled')
-        this.setState({ persons: response.data })
+        this.setState({ persons: response })
       })
   }
 
@@ -31,19 +33,63 @@ class App extends React.Component {
       number: this.state.newNumber
     }
 
-  if(!this.state.persons.some(person => (person.name === this.state.newName))) {
-    const persons = this.state.persons.concat(personObject)
-
-      this.setState({
-        persons,
-        newName: '',
-        newNumber: ''
-      })
+    if(!this.state.persons.some(person => (person.name === this.state.newName))) {
+      personService
+        .create(personObject)
+        .then(newName => {
+          this.setState({
+            persons: this.state.persons.concat(newName),
+            newName: '',
+            newNumber: '',
+            notice: `lisättiin ${this.state.newName}`
+          })
+          setTimeout(() => {
+            this.setState({notice: null})
+          }, 5000)
+        })
+        .catch(error => {
+          this.setState({
+            notice: `virhe ${this.state.newName} lisäyksessä`,
+            noticeType: 'ERROR'
+          })
+          setTimeout(() => {
+            this.setState({notice: null, noticeType: 'NOTICE'})
+          }, 5000)
+        })
     } else {
-      this.setState({
-        newName: '',
-        newNumber: ''
-      })
+      if (window.confirm(`${this.state.newName} on jo luettelossa, korvataanko vanha numero uudella`))
+      {
+        let updatedPerson = this.state.persons.find(person => (person.name === this.state.newName))
+        personService
+          .update(updatedPerson.id, personObject)
+          .then(newName => {
+            this.setState({
+              persons: this.state.persons.map(el =>
+                (el.name === this.state.newName ? Object.assign({}, el, el.number=this.state.newNumber) : el)),
+              newName: '',
+              newNumber: '',
+              notice: `päivitettiin ${this.state.newName}`
+            })
+            setTimeout(() => {
+              this.setState({notice: null})
+            }, 5000)
+          })
+          .catch(error => {
+            this.setState({
+              notice: `virhe ${this.state.newName} päivityksessä`,
+              noticeType: 'ERROR'
+
+            })
+            setTimeout(() => {
+              this.setState({notice: null, noticeType:'NOTICE'})
+            }, 5000)
+          })
+      } else {
+        this.setState({
+          newName: '',
+          newNumber: ''
+        })
+      }
     }
   }
 
@@ -56,7 +102,6 @@ class App extends React.Component {
   }
 
   handleFilterChange = (event) => {
-
     this.setState({ filter: event.target.value })
     let filteredList = this.state.persons
     filteredList = filteredList.filter(function(item){
@@ -66,10 +111,38 @@ class App extends React.Component {
     this.setState({filteredItems: filteredList});
   }
 
+  onDelete = (id, name) => {
+    personService
+      .remove(id)
+      .then(deleted => {
+        this.setState({
+          persons: this.state.persons.filter(el => el.id !== id),
+          notice: `poistettiin ${name}`
+        })
+        setTimeout(() => {
+          this.setState({notice: null})
+        }, 5000)
+      })
+      .catch(error => {
+        this.setState({
+          notice: `virhe ${name} poistamisessa`,
+          noticeType: 'ERROR'
+        })
+        setTimeout(() => {
+          this.setState({notice: null, noticeType: 'NOTICE'})
+        }, 5000)
+      })
+  }
+
   render() {
     let visibleList
     if(this.state.filter === '') {
-      visibleList = this.state.persons.map(person => <Person key={person.name} person={person} />)
+      visibleList = this.state.persons.map(
+          person => <Person key={person.name}
+                    person={person}
+                    onDelete={this.onDelete.bind(this)}
+                    />
+          )
     } else {
       visibleList = this.state.filteredItems.map(person => <Person key={person.name} person={person} />)
     }
@@ -77,6 +150,7 @@ class App extends React.Component {
     return (
       <div>
         <h2>Puhelinluettelo</h2>
+        <Notification message={this.state.notice} noticeType={this.state.noticeType}/>
         rajaa näytettäviä:
         <input
           value={this.state.filter}
